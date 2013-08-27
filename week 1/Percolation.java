@@ -1,4 +1,5 @@
-    
+import java.util.*;
+
 public class Percolation {    
     
     private int grid [];
@@ -6,6 +7,7 @@ public class Percolation {
 
     private int dimension;
     
+    /*
     public void dump()
     {
         for(int j=1; j<=dimension;j++)
@@ -22,7 +24,7 @@ public class Percolation {
         System.out.println(weight[0]+", "+weight[dimension*dimension +1]);
         
     }
-            
+    */       
         
     private void union(int a_x, int a_y, int b_x, int b_y)
     {
@@ -46,8 +48,6 @@ public class Percolation {
     // find root
     private int find(int n)
     {
-        //System.out.println("n " + n);
-        //System.out.println("grid[n]" + grid[n]);
         while(grid[n] != n)
             n = grid[n];
         return n;
@@ -61,11 +61,8 @@ public class Percolation {
         weight = new int[N*N + 2];
         
         //Initialize grid with -1 values(except top and bottom). It means that site is block.
-        for (int i = 1; i < N*N+1; i++)
-        {
-            grid[i] = -1;
-            weight[i] = 1;
-        }
+        Arrays.fill(grid,-1);
+        Arrays.fill(weight,-1);
         
         grid[0] = 0;
         grid[N*N+1] = N*N+1;

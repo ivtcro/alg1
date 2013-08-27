@@ -37,7 +37,7 @@ public class PercolationStats {
                 }
            }
         //test.dump();                    
-        fractions[i]=(double)counter / N / N;
+        fractions[i]=(double)counter / (double) N / (double) N;
        }     
        
    }
