@@ -1,19 +1,20 @@
-import java.util.*;
+import java.util.Arrays;
 
 public class PercolationStats {
     
-   private double fractions[];
-   private int repeat_number;   
+   private double[] fractions;
+   private int repeatNumber;   
    
-   public PercolationStats(int N, int T)    // perform T independent computational experiments on an N-by-N grid
+   // perform T independent computational experiments on an N-by-N grid
+   public PercolationStats(int N, int T)    
    {
-       if( N <= 0 || T <= 0 )
-           throw new IndexOutOfBoundsException("ERROR: Incorrect input data");
+       if (N <= 0 || T <= 0)
+           throw new IllegalArgumentException("ERROR: Incorrect input data");
        
        fractions = new double[T];
        Arrays.fill(fractions, 0);
        
-       repeat_number = T;
+       repeatNumber = T;
                   
        for (int i = 0; i < T; i++)
        {
@@ -28,16 +29,16 @@ public class PercolationStats {
                 p = 1 + (int) (Math.random() * N);
                 q = 1 + (int) (Math.random() * N);
                 
-                if(test.isFull(p,q))
+                if (!test.isOpen(p, q))
                 {
                     //System.out.println("Iteration #"+ counter+ ".p="+ p +",q="+q);
-                    test.open(p,q);
+                    test.open(p, q);
                     //test.dump();                    
                     counter++;
                 }
            }
         //test.dump();                    
-        fractions[i]=(double)counter / (double) N / (double) N;
+        fractions[i] = (double) counter / (double) N / (double) N;
        }     
        
    }
@@ -49,37 +50,55 @@ public class PercolationStats {
        for (int i = 0; i < fractions.length; i++) 
             sum += fractions[i];
        
-       return (sum/repeat_number);
+       return (sum/repeatNumber);
    }
    
-   public double stddev()                   // sample standard deviation of percolation threshold
+   // sample standard deviation of percolation threshold
+   public double stddev()                   
    {
+       if (repeatNumber == 1)
+           return Double.NaN;
+       
        double mean = this.mean();
        double stddev = 0;
        
-       for (int i = 0; i < fractions.length; i++) 
-            stddev += Math.pow((fractions[i] - mean), 2);
+       for (int i = 0; i < fractions.length; i++)
+       {
+           double x = fractions[i] - mean;
+           stddev += x*x;
+       }
        
-       return Math.sqrt( stddev / (repeat_number - 1));   
+       return Math.sqrt(stddev / (repeatNumber - 1));   
        
    }
    
-   public double confidenceLo()             // returns lower bound of the 95% confidence interval
+    // returns lower bound of the 95% confidence interval
+   public double confidenceLo()            
    {
-       return (mean() - (double)1.96 * stddev() / Math.sqrt(repeat_number) );
+       return (mean() - (double) 1.96 * stddev() / Math.sqrt(repeatNumber));
    }
        
-   public double confidenceHi()             // returns upper bound of the 95% confidence interval
+   // returns upper bound of the 95% confidence interval
+   public double confidenceHi()             
    {
-       return (mean() + (double)1.96 * stddev() / Math.sqrt(repeat_number) );
+       return (mean() + (double) 1.96 * stddev() / Math.sqrt(repeatNumber));
    }
-       
-   public static void main(String[] args)   // test client, described below
+   
+   // test client, described below
+   public static void main(String[] args)   
    {
-       PercolationStats stat = new PercolationStats (Integer.parseInt(args[0]),Integer.parseInt(args[1]));
+       Percolation test = new Percolation(3);
+       test.open(1,3);
+       test.open(2,3);
+       test.open(3,3);
+       test.open(3,1);
+       System.out.println(test.isFull(1,3));
+       PercolationStats stat = new PercolationStats(
+              Integer.parseInt(args[0]), Integer.parseInt(args[1]));
        System.out.println("mean\t\t\t\t = " + stat.mean());
        System.out.println("stddev\t\t\t\t = " + stat.stddev());
-       System.out.println("95% confidence interval\t\t = " + stat.confidenceLo() + " " + stat.confidenceHi());
+       System.out.println("95% confidence interval\t\t = " + stat.confidenceLo() 
+                              + " " + stat.confidenceHi());
        
    }
        

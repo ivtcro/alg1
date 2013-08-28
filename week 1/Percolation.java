@@ -1,12 +1,33 @@
-import java.util.*;
+import java.util.Arrays;
 
 public class Percolation {    
     
-    private int grid [];
-    private int weight[];
+    private int[] grid;
+    private int[] weight;
 
     private int dimension;
     
+            
+    // create N-by-N grid, with all sites blocked
+    public Percolation(int N)              
+    {
+        dimension = N;
+        // Two additional elemnts for "virtual" top and bottom sites.
+        grid = new int[N*N+2];
+        weight = new int[N*N + 2];
+        
+        //Initialize grid with -1 values(except top and bottom). 
+        //It means that site is block.
+        Arrays.fill(grid, -1);
+        Arrays.fill(weight, -1);
+        
+        grid[0] = 0;
+        grid[N*N+1] = N*N+1;
+        weight[0] = 1;
+        weight[N*N+1] = 1;
+
+    }
+
     /*
     public void dump()
     {
@@ -26,21 +47,21 @@ public class Percolation {
     }
     */       
         
-    private void union(int a_x, int a_y, int b_x, int b_y)
+    private void union(int ax, int ay, int bx, int by)
     {
-        int a_n = find(a_x + (a_y - 1)*dimension);
-        int b_n = find(b_x + (b_y - 1)*dimension);
-        if(a_n != b_n)
+        int an = find(ay + (ax - 1)*dimension);
+        int bn = find(by + (bx - 1)*dimension);
+        if (an != bn)
         {
-            if( weight[a_n] > weight[b_n] )
+            if (weight[an] > weight[bn])
             {
-                weight[a_n] += weight[b_n];
-                grid[b_n] = a_n;
+                weight[an] += weight[bn];
+                grid[bn] = an;
             }
             else
             {
-                weight[b_n] += weight[a_n];
-                grid[a_n] = b_n;
+                weight[bn] += weight[an];
+                grid[an] = bn;
             }            
         }
     }
@@ -48,79 +69,63 @@ public class Percolation {
     // find root
     private int find(int n)
     {
-        while(grid[n] != n)
-            n = grid[n];
-        return n;
-    }
-        
-    public Percolation(int N)              // create N-by-N grid, with all sites blocked
-    {
-        dimension=N;
-        // Two additional elemnts for "virtual" top and bottom sites.
-        grid = new int[N*N+2];
-        weight = new int[N*N + 2];
-        
-        //Initialize grid with -1 values(except top and bottom). It means that site is block.
-        Arrays.fill(grid,-1);
-        Arrays.fill(weight,-1);
-        
-        grid[0] = 0;
-        grid[N*N+1] = N*N+1;
-        weight[0] = 1;
-        weight[N*N+1] = 1;
-
+        int i = n;
+        while (grid[i] != i)
+            i = grid[i];
+        return i;
     }
     
-    public void open(int i, int j)         // open site (row i, column j) if it is not already
+    // open site (row i, column j) if it is not already
+    public void open(int i, int j)         
     {
         // If it's already opened - do nothing
-        if(isFull(i,j))
+        if (!isOpen(i, j))
         {
-            int n = i + (j -1) * dimension;
+            int n = j + (i -1) * dimension;
             grid[n] = n;
 
-            //If the cell not the elast in the line
-            if(i < dimension)
-                if(isOpen(i+1,j))
-                   union(i,j,i+1,j);
-            //If the cell not the first in the line
-            if(i > 1)
-                if(isOpen(i-1,j))
-                   union(i,j,i-1,j);                
-
             //If the cell not the last in the row
-            if(j < dimension)
-                if(isOpen(i,j+1))
-                   union(i,j,i,j+1);
+            if (i < dimension)
+                if (isOpen(i+1, j))
+                   union(i, j, i+1, j);
             //If the cell not the first in the row
-            if(j > 1)
-                if(isOpen(i,j-1))
-                   union(i,j,i,j-1);
+            if (i > 1)
+                if (isOpen(i-1, j))
+                   union(i, j, i-1, j);                
+
+            //If the cell not the last in the column
+            if (j < dimension)
+                if (isOpen(i, j+1))
+                   union(i, j, i, j+1);
+            //If the cell not the first in the column
+            if (j > 1)
+                if (isOpen(i, j-1))
+                   union(i, j, i, j-1);
             
-            if(j == 1)
-                //(0,1) = top element
-                union(0,1,i,j);
+            if (i == 1)
+                //(1,0) = top element
+                union(1, 0, i, j);
             
-            if(j == dimension)
+            if (i == dimension)
                 //(N+1,N) = bottom element
-                union(dimension+1,dimension,i,j);
+                union(dimension, dimension + 1, i, j);
         }
         
     }
                 
-    // TODO: Exception check should be added
-    public boolean isOpen(int i, int j)    // is site (row i, column j) open?
+    // open site (row i, column j) if it is not already
+    public boolean isOpen(int i, int j)    
     {
-        if ( i > dimension || i < 1 ||
-            j > dimension || j < 1)
+        if (i > dimension || i < 1 
+            || j > dimension || j < 1)
             throw new IndexOutOfBoundsException("ERROR: Check array indexes");
-        if (grid[i+(j-1)*dimension] < 0)
+        if (grid[j+(i-1)*dimension] < 0)
             return false;
         return true;
     }
     public boolean isFull(int i, int j)    // is site (row i, column j) full?
     {
-        return !isOpen(i,j);
+        return (isOpen(i, j) && (find(0) == find(j + (i-1) * dimension)));
     }
     public boolean percolates()            // does the system percolate?
     {
