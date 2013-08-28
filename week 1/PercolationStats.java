@@ -88,11 +88,11 @@ public class PercolationStats {
    public static void main(String[] args)   
    {
        Percolation test = new Percolation(3);
-       test.open(1,3);
+       /*test.open(1,3);
        test.open(2,3);
        test.open(3,3);
        test.open(3,1);
-       System.out.println(test.isFull(1,3));
+       System.out.println(test.isFull(3,1));*/
        PercolationStats stat = new PercolationStats(
               Integer.parseInt(args[0]), Integer.parseInt(args[1]));
        System.out.println("mean\t\t\t\t = " + stat.mean());

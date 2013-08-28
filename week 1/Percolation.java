@@ -4,6 +4,7 @@ public class Percolation {
     
     private int[] grid;
     private int[] weight;
+    private boolean[][] water;
 
     private int dimension;
     
@@ -16,10 +17,13 @@ public class Percolation {
         grid = new int[N*N+2];
         weight = new int[N*N + 2];
         
+        // false - empty, true - filled
+        water = new boolean[N][N];
+
         //Initialize grid with -1 values(except top and bottom). 
         //It means that site is block.
         Arrays.fill(grid, -1);
-        Arrays.fill(weight, -1);
+        Arrays.fill(weight, -1);        
         
         grid[0] = 0;
         grid[N*N+1] = N*N+1;
@@ -75,6 +79,25 @@ public class Percolation {
         return i;
     }
     
+    private boolean connected(int a, int b)
+    {
+        return (find(a) == find(b));
+    }
+    
+    private void flow(int i, int j)
+    {
+        if (i < 1 || i > dimension || j < 1 || j > dimension)
+            return;
+        
+        if (isOpen(i, j) && !isFull(i, j))
+        {
+            water[i-1][j-1] = true;
+            flow(i, j-1);
+            flow(i, j+1);
+            flow(i-1, j);
+            flow(i+1, j);
+        }
+    }
     // open site (row i, column j) if it is not already
     public void open(int i, int j)         
     {
@@ -84,31 +107,61 @@ public class Percolation {
             int n = j + (i -1) * dimension;
             grid[n] = n;
 
-            //If the cell not the last in the row
+            //If the cell not the last in the column
             if (i < dimension)
                 if (isOpen(i+1, j))
+                {
                    union(i, j, i+1, j);
-            //If the cell not the first in the row
+                   if (isFull(i+1, j))
+                       water[i-1][j-1] = true;
+                }
+            //If the cell not the first in the column
             if (i > 1)
                 if (isOpen(i-1, j))
-                   union(i, j, i-1, j);                
+                {
+                   union(i, j, i-1, j);
+                   if (isFull(i-1, j))
+                       water[i-1][j-1] = true;
+                }
 
-            //If the cell not the last in the column
+            //If the cell not the last in the row
             if (j < dimension)
                 if (isOpen(i, j+1))
+                {
                    union(i, j, i, j+1);
-            //If the cell not the first in the column
+                   if (isFull(i, j+1))
+                       water[i-1][j-1] = true;
+                }
+            //If the cell not the first in the row
             if (j > 1)
                 if (isOpen(i, j-1))
+                {
                    union(i, j, i, j-1);
+                   if (isFull(i, j-1))
+                       water[i-1][j-1] = true;
+                }
             
             if (i == 1)
+            {
                 //(1,0) = top element
                 union(1, 0, i, j);
+                water[i-1][j-1] = true;
+            }
             
             if (i == dimension)
                 //(N+1,N) = bottom element
                 union(dimension, dimension + 1, i, j);
+            
+            // Fill with "water"
+            if (water[i-1][j-1])
+            {
+                flow(i, j-1);
+                flow(i, j+1);
+                flow(i-1, j);
+                flow(i+1, j);
+            }
+                
+            
         }
         
     }
@@ -125,10 +178,10 @@ public class Percolation {
     }
     public boolean isFull(int i, int j)    // is site (row i, column j) full?
     {
-        return (isOpen(i, j) && (find(0) == find(j + (i-1) * dimension)));
+        return water[i-1][j-1];
     }
     public boolean percolates()            // does the system percolate?
     {
-        return (find(0) == find(dimension*dimension+1));
+        return (connected(0, (dimension * dimension + 1)));
     }
 }
