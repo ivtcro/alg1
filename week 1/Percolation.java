@@ -172,12 +172,17 @@ public class Percolation {
         if (i > dimension || i < 1 
             || j > dimension || j < 1)
             throw new IndexOutOfBoundsException("ERROR: Check array indexes");
+        
         if (grid[j+(i-1)*dimension] < 0)
             return false;
         return true;
     }
     public boolean isFull(int i, int j)    // is site (row i, column j) full?
     {
+        if (i > dimension || i < 1 
+            || j > dimension || j < 1)
+            throw new IndexOutOfBoundsException("ERROR: Check array indexes");
+
         return water[i-1][j-1];
     }
     public boolean percolates()            // does the system percolate?
