@@ -166,7 +166,7 @@ public class Deque<Item>  implements Iterable<Item>{
            return item;
        }
    }
-   
+ /*  
    public void dump()
    {   
        System.out.print("DUMP(" + size + "): "); 
@@ -205,5 +205,5 @@ public class Deque<Item>  implements Iterable<Item>{
        deque.dump();
        deque.iterator().next();
 
-   }
+   }*/
 }
