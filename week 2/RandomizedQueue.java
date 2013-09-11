@@ -67,12 +67,12 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
        int index = (int) (Math.random() * size);
        Item tmp = array[index];
        
-       if ( index != size)
-           array[index] = array [size];
+       if (index != size)
+           array[index] = array [(size-1)];
        
-       size--;
+       size--;       
        
-       if (size == (int) (arraySize/4))
+       if (size == (int) (arraySize / 4))
            resize( (int) (arraySize / 2));
        
        return tmp;
@@ -107,4 +107,22 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
            return item;
        }
    }
-}
+    /*public static void main(String[] args)
+    {
+       
+       RandomizedQueue<String> rq = new RandomizedQueue <String>();
+       while (!StdIn.isEmpty())
+           rq.enqueue(StdIn.readString());
+       Iterator itr = rq.iterator();
+       while (itr.hasNext())
+               System.out.println(itr.next());
+       
+       System.out.println("-" + rq.dequeue());
+       System.out.println("-" + rq.dequeue());
+       itr = rq.iterator();
+       while (itr.hasNext())
+               System.out.println(itr.next());
+       }*/
+    }
+
+   
