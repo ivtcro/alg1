@@ -17,15 +17,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
            random[i] = i;
        }
        
-       for (int i=0;i<size;i++)
-       {
-           int j = (int) (Math.random() * size );
-           int tmp = random[j];
-           random[j]= random[i];
-           random[i] = tmp;
-       }
-       
-       //System.out.println(Arrays.toString(random));
+       StdRandom.shuffle(random);
        return random;
    }
            
@@ -57,6 +49,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    }
    public void enqueue(Item item)     // add the item
    {       
+       if (item == null)
+           throw new NullPointerException("NULL value couln't be added in to the structure");
+       
        if( arraySize == (size + 1))
            resize(arraySize * 2);
        array[size] = item;
@@ -64,13 +59,17 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    }
    public Item dequeue()              // delete and return a random item
    {
+       if (this.isEmpty())
+           throw new NoSuchElementException("No elements in the RandomizedQueue");
+
        int index = (int) (Math.random() * size);
        Item tmp = array[index];
        
        if (index != size)
            array[index] = array [(size-1)];
        
-       size--;       
+       array [(size-1)] = null;
+       size--;
        
        if (size == (int) (arraySize / 4))
            resize( (int) (arraySize / 2));
@@ -80,6 +79,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    
    public Item sample()               // return (but do not delete) a random item
    {
+       if (this.isEmpty())
+           throw new NoSuchElementException("No elements in the RandomizedQueue");
+
        int index = (int) (Math.random() * size);
        return array[index];
    }
@@ -92,6 +94,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
    private class ListIterator implements Iterator<Item> {
        
        private int[] random = shuffle();
+       
        private int current = 0;
               
        public boolean hasNext() {return (size - current)  > 0;}
